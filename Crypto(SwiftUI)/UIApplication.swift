@@ -6,3 +6,16 @@
 //
 
 import Foundation
+import SwiftUI
+
+extension UIApplication {
+    
+    /// Dismis keyboard
+    /// ```
+    /// UIApplication.shared.endEditing()
+    /// ```
+    func endEditing(){
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+    
+}

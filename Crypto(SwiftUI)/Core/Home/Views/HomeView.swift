@@ -10,8 +10,9 @@ import SwiftUI
 struct HomeView: View {
     
     @EnvironmentObject var vm: HomeViewModel
-    @State private var showPortfolio: Bool = true
-    @State private var showPortfolioView: Bool = false
+    @State private var showPortfolio: Bool = false // transition ro right
+    @State private var showPortfolioView: Bool = false // show sheet
+    @State private var showSettingsView: Bool = false
     
     var body: some View {
         ZStack {
@@ -34,20 +35,22 @@ struct HomeView: View {
                 
                 columnTitles
             
-                if !showPortfolio {
-                    allCoinsList
-                        .transition(.move(edge: .leading))
-                    
-                }else{
+                if showPortfolio {
                     protfolioCoinsList
                         .transition(.move(edge: .trailing))
-                        
+                }else{
+                    allCoinsList
+                        .transition(.move(edge: .leading))
                 }
                 
                 Spacer(minLength: 0)//to push to top but still in safeArea
                 
             }
+            .sheet(isPresented: $showSettingsView, content: {
+                SettingsView()
+            })
         }
+
     }
 }
 
@@ -69,7 +72,12 @@ extension HomeView {
                     CircleButtonAnimationView(animate: $showPortfolio)
                 )
                 .onTapGesture(perform: {
-                    showPortfolioView = showPortfolio
+                    if showPortfolio {
+                        showPortfolioView.toggle()
+                    }else {
+                        showSettingsView.toggle()
+                    }
+                    
                 })
             
             Spacer()
@@ -97,13 +105,18 @@ extension HomeView {
     private var allCoinsList: some View {
         List {
             ForEach(vm.allCoins) { coin in
-                CoinRowView(coin: coin, showHoldingsColumn: false)
-                    .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                NavigationLink(value: coin) {
+                    CoinRowView(coin: coin, showHoldingsColumn: false)
+                        .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                }
             }
         }
         .listStyle(.plain)
         .refreshable {
             vm.reloadData()
+        }
+        .navigationDestination(for: CoinModel.self) { coin in
+            DetailView(coin: coin)
         }
     }
     
