@@ -34,13 +34,22 @@ struct HomeView: View {
                 SearchBarView(searchText: $vm.searchText)
                 
                 columnTitles
-            
+                
                 if showPortfolio {
-                    protfolioCoinsList
-                        .transition(.move(edge: .trailing))
+                    ZStack {
+                        if vm.portfolioCoins.isEmpty && vm.searchText.isEmpty {
+                            portfolioEmptyText
+                        }else{
+                            protfolioCoinsList
+                            
+                        }
+                        
+                    }
+                    .transition(.move(edge: .leading))
+                    
                 }else{
                     allCoinsList
-                        .transition(.move(edge: .leading))
+                        .transition(.move(edge: .trailing))
                 }
                 
                 Spacer(minLength: 0)//to push to top but still in safeArea
@@ -50,7 +59,7 @@ struct HomeView: View {
                 SettingsView()
             })
         }
-
+        
     }
 }
 
@@ -134,6 +143,15 @@ extension HomeView {
         }
     }
     
+    private var portfolioEmptyText: some View {
+        Text("You haven't added any coins to your portfolio. Click the + button to get started! 🧐")
+            .font(.callout)
+            .foregroundStyle(Color.theme.accent)
+            .fontWeight(.medium)
+            .multilineTextAlignment(.center)
+            .padding(60)
+    }
+    
     private var columnTitles: some View {
         HStack{
             HStack(spacing: 4) {
@@ -184,7 +202,7 @@ extension HomeView {
                 Image(systemName: "goforward")
             }
             .rotationEffect(.degrees(vm.isLoading ? 360 : 0), anchor: .center)
-
+            
         }
         .foregroundStyle(.secondaryText)
         .font(.caption)
